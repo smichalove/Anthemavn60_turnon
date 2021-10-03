@@ -14,7 +14,10 @@ Using Circuit Python on Rasbarry Pico code.py =
 GP16 on pico connected to GPIO21 on pi
 
 '''
-import time
+
+
+
+
 import signal                   
 import sys
 from time import sleep 
@@ -38,7 +41,6 @@ GPIO.setup(pico, GPIO.IN)
 Button.was_held = False
 
 
-
 ## Anthem Fuctions
 async def test():
     parser = argparse.ArgumentParser(description=test.__doc__)
@@ -55,37 +57,36 @@ async def test():
 
     def log_callback(message):
         log.info("Callback invoked: %s" % message)
-
-    host = args.host
-    port = int(args.port)
-
-    log.info("Connecting to Anthem AVR at %s:%i" % (host, port))
-
-    conn = await anthemav.Connection.create(
-        host=host, port=port, loop=loop, update_callback=log_callback
-    )
-
-    log.info("Power state is " + str(conn.protocol.power))
-    conn.protocol.power = True
-    log.info("Power state is " + str(conn.protocol.power))
-
-    #await asyncio.sleep(2, loop=loop)
-    log.info("Anthem power On" + str(conn.protocol.power))
-
-    conn.protocol.power = True ## Turn Power On
-    log.info("Anthem power On" + str(conn.protocol.power))
-    sleep(1)
-    conn._closing = True # Close Connection
-    conn.halt
-    conn.auto_reconnect = False
-    log.info("Auto Reconnect " + str(conn.auto_reconnect))
-    log.info("Connection halt " + str(conn.halt))
     
-    
-    
-    
+    if GPIO.input(pico) == 1:
 
-    ## end Anthem functions
+        host = args.host
+        port = int(args.port)
+
+        log.info("Connecting to Anthem AVR at %s:%i" % (host, port))
+
+        conn = await anthemav.Connection.create(
+            host=host, port=port, loop=loop, update_callback=log_callback
+        )
+
+        log.info("Power state is " + str(conn.protocol.power))
+        conn.protocol.power = True
+        log.info("Power state is " + str(conn.protocol.power))
+
+        #await asyncio.sleep(2, loop=loop)
+        log.info("Anthem power On" + str(conn.protocol.power))
+
+        conn.protocol.power = True ## Turn Power On
+        log.info("Anthem power On" + str(conn.protocol.power))
+        sleep(1)
+        conn._closing = True # Close Connection
+        conn.halt
+        conn.auto_reconnect = False
+        log.info("Auto Reconnect " + str(conn.auto_reconnect))
+        log.info("Connection halt " + str(conn.halt))
+    
+        
+      ## end Anthem functions
 
 def held(btn): #when siglnal is high and stays high
     btn.was_held = True
@@ -131,7 +132,7 @@ if __name__ == '__main__':
             btn.when_held = held
             btn.when_released = released
             sleep(1)
-            if GPIO.input(pico) and runonce: # if port 20 == 1, connect to Athhem AVM60 and turn it on when the Pico turns off with TV via USB
+            if GPIO.input(pico) == 1 and runonce: # if port 20 == 1, connect to Athhem AVM60 and turn it on when the Pico turns off with TV via USB
                 print("TV is On, Turning on everything else")
                 datetime_object = datetime.datetime.now()
                 print(datetime_object)
@@ -147,7 +148,7 @@ if __name__ == '__main__':
                 runonce = False
             else:
                 if GPIO.input(pico) == 0:
-                    runonce = GPIO.input(pico)
+                    runonce = True
                     print ("TV Off, Listning")
                     #btn.when_held = held
                     btn.when_released = released
