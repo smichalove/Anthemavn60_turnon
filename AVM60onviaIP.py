@@ -12,18 +12,11 @@ https://learn.adafruit.com/getting-started-with-raspberry-pi-pico-circuitpython/
 Conntect USB-C of pico to USB on TV
 Using Circuit Python on Rasbarry Pico code.py =
 GP16 on pico connected to GPIO21 on pi
+
+'''
 import time
 import board
 import digitalio
-
-led = digitalio.DigitalInOut(board.GP16)
-led.direction = digitalio.Direction.OUTPUT
-
-while True:
-    led.value = True
-    time.sleep(0.5)
-'''
-
 import signal                   
 import sys
 from time import sleep 
