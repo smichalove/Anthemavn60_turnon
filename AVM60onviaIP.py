@@ -15,8 +15,6 @@ GP16 on pico connected to GPIO21 on pi
 
 '''
 import time
-import board
-import digitalio
 import signal                   
 import sys
 from time import sleep 
