@@ -147,7 +147,7 @@ if __name__ == '__main__':
                 runonce = False
             else:
                 if GPIO.input(pico) == 0:
-                    runonce = True
+                    runonce = GPIO.input(pico)
                     print ("TV Off, Listning")
                     #btn.when_held = held
                     btn.when_released = released
