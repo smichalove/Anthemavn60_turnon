@@ -1,5 +1,5 @@
 # Anthme60_turnon
-
+see: https://github.com/smichalove/Amp_Controller
 uses https://github.com/nugget/python-anthemav/blob/master/example.py
 Pulse conversion from constant 12V input
 This assumes your Mark Levinson APM is on Standby as start state
