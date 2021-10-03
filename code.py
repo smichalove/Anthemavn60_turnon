@@ -1,4 +1,5 @@
 #boot file code.py on Raspberry pico
+#written for circuitpython
 import time
 import board
 import digitalio
