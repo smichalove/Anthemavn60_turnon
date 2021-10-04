@@ -32,7 +32,7 @@ log = logging.getLogger(__name__)
 #GPIO.setmode(GPIO.BCM)
 GPIO.setmode(GPIO.BCM)
 AMP=21 #Control Signal to amp
-GPIO.setup(AMP, GPIO.OUT
+GPIO.setup(AMP, GPIO.OUT)
 pico = 20
 GPIO.setup(pico, GPIO.IN,pull_up_down=GPIO.PUD_DOWN)
 Button.was_held = False
