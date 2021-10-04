@@ -14,10 +14,6 @@ Using Circuit Python on Rasbarry Pico code.py =
 GP16 on pico connected to GPIO21 on pi
 
 '''
-
-
-
-
 import signal                   
 import sys
 from time import sleep 
@@ -35,9 +31,9 @@ log = logging.getLogger(__name__)
 #GPIO.setmode(GPIO.BCM)
 GPIO.setmode(GPIO.BCM)
 AMP=21 #Control Signal to amp
-GPIO.setup(AMP, GPIO.OUT)
+GPIO.setup(AMP, GPIO.OUT
 pico = 20
-GPIO.setup(pico, GPIO.IN)
+GPIO.setup(pico, GPIO.IN,pull_up_down=GPIO.PUD_DOWN)
 Button.was_held = False
 
 
@@ -133,6 +129,8 @@ if __name__ == '__main__':
             btn.when_released = released
             sleep(1)
             if GPIO.input(pico) == 1 and runonce: # if port 20 == 1, connect to Athhem AVM60 and turn it on when the Pico turns off with TV via USB
+                state = GPIO.input(pico)
+                print ("gpio state:",state)
                 print("TV is On, Turning on everything else")
                 datetime_object = datetime.datetime.now()
                 print(datetime_object)
@@ -148,6 +146,8 @@ if __name__ == '__main__':
                 runonce = False
             else:
                 if GPIO.input(pico) == 0:
+                    state = GPIO.input(pico)
+                    print ("gpio state:",state)
                     runonce = True
                     print ("TV Off, Listning")
                     #btn.when_held = held
