@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# https://github.com/nugget/python-anthemav/blob/master/example.py
+# you need to install: python-anthemav
+# https://github.com/nugget/python-anthemav/
 # Pulse conversion from constant 12V input
 #This assumes your Mark Levinson APM is on Standby as start state
 #Your input to the Mark Levinson Should connect to GPIO21 for + and a GRND
@@ -25,7 +26,7 @@ import datetime
 #load for Anthem:https://github.com/nugget/python-anthemav/blob/master/example.py
 import argparse
 import asyncio
-import anthemav
+import anthemav # install:https://github.com/nugget/python-anthemav/
 import logging
 log = logging.getLogger(__name__)
 #GPIO.setmode(GPIO.BCM)
