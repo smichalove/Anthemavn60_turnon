@@ -33,9 +33,13 @@ log = logging.getLogger(__name__)
 GPIO.setmode(GPIO.BCM)
 AMP=21 #Control Signal to amp
 GPIO.setup(AMP, GPIO.OUT)
+
+pico=20
 pico = 20
+
 GPIO.setup(pico, GPIO.IN,pull_up_down=GPIO.PUD_DOWN)
 Button.was_held = False
+btn = Button(26,bounce_time = .001) # relay is on pin GPIO26  and GRND
 
 
 ## Anthem Fuctions
@@ -81,13 +85,38 @@ async def test():
         conn.auto_reconnect = False
         log.info("Auto Reconnect " + str(conn.auto_reconnect))
         log.info("Connection halt " + str(conn.halt))
+    elif GPIO.input(pico) == 0:  #Turn off the amp when pico goes off
+        print("TV is off")
+        host = args.host
+        port = int(args.port)
+
+        log.info("Connecting to Anthem AVR at %s:%i" % (host, port))
+
+        conn = await anthemav.Connection.create(
+            host=host, port=port, loop=loop, update_callback=log_callback
+        )
+
+        log.info("Power state is " + str(conn.protocol.power))
+        conn.protocol.power = False #power off
+        log.info("Power state is " + str(conn.protocol.power))
+
+        #await asyncio.sleep(2, loop=loop)
+        log.info("Anthem power On" + str(conn.protocol.power))
+
+        conn.protocol.power = False ## Turn Power On
+        log.info("Anthem power On" + str(conn.protocol.power))
+        sleep(1)
+        conn._closing = True # Close Connection
+        conn.halt
+        conn.auto_reconnect = False
+        log.info("Auto Reconnect " + str(conn.auto_reconnect))
+        log.info("Connection halt " + str(conn.halt))
+        
     
         
       ## end Anthem functions
 
 def held(btn): #when siglnal is high and stays high
-    global ampon
-    ampon = True
     btn.was_held = True
     datetime_object = datetime.datetime.now()
     print(datetime_object)
@@ -95,11 +124,11 @@ def held(btn): #when siglnal is high and stays high
     GPIO.output(AMP, 1) 
     sleep(.3) 
     GPIO.output(AMP, 0)
-    return True
+    ampison = True
 
 def released(btn): #when signal is low and stays low
-    global ampon
-    ampon = False
+    global ampison
+
     if not btn.was_held:
         datetime_object = datetime.datetime.now()
         print(datetime_object)
@@ -108,9 +137,7 @@ def released(btn): #when signal is low and stays low
         sleep(.3) 
         GPIO.output(AMP, 0)        
         pressed()
-        return True
-
-
+        ampison = False
     else:       
         print(time.time())
         datetime_object = datetime.datetime.now()
@@ -119,24 +146,30 @@ def released(btn): #when signal is low and stays low
         GPIO.output(AMP, 1) 
         sleep(.3) 
         GPIO.output(AMP, 0)
-        return True
+        ampison = False 
    
     btn.was_held = False
 
 def pressed():
+    global ampison
     datetime_object = datetime.datetime.now()
     print(datetime_object)
     print("button was pressed not held")
+    if GPIO.input(pico) == 0:
+        GPIO.output(AMP, 1) 
+        sleep(.3) 
+        GPIO.output(AMP, 0)
+        ampison = True 
 
-btn = Button(26,bounce_time = .001) # relay is on pin GPIO26  and GRND
+    
 
 if __name__ == '__main__':
     runonce = True
     try:
         print ("listning...")              
         while True: 
-            btn.when_held = held()
-            btn.when_released = released()
+            btn.when_held = held
+            btn.when_released = released
             sleep(1)
             if GPIO.input(pico) == 1 and runonce: # if port 20 == 1, connect to Athhem AVM60 and turn it on when the Pico turns off with TV via USB
                 state = GPIO.input(pico)
@@ -148,16 +181,11 @@ if __name__ == '__main__':
                 logging.basicConfig(level=logging.ERROR)
                 loop = asyncio.get_event_loop()
                 loop.run_until_complete(test())
-
                 sleep(1)
                 print ("Wait for Anthem")
                 sleep(1)
                 print(datetime_object)
                 print ("Anthem On, listning for a button...")
-                if not ampon:
-                    GPIO.output(AMP, 1)
-                    sleep(.3)
-                    GPIO.output(AMP, 0)
                 runonce = False
             else:
                 if GPIO.input(pico) == 0:
@@ -166,23 +194,21 @@ if __name__ == '__main__':
                     runonce = True
                     print ("TV Off, Listning")
                     #btn.when_held = held
-                    btn.when_released = False
-                    btn.when_released = released()
-                    if ampon:
-                        GPIO.output(AMP, 1)
-                        sleep(.3)
-                        GPIO.output(AMP, 0)
+                    btn.when_released = released
+                    sleep(1)
+                    logging.basicConfig(level=logging.ERROR)
+                    loop = asyncio.get_event_loop()
+                    loop.run_until_complete(test())
+                '''if ampison:
+                    GPIO.output(AMP, 1) 
+                    sleep(.3) 
+                    GPIO.output(AMP, 0)'''
 
-
-
-
-                sleep(1)
                 
     # run until a keyboard interupt
-    except KeyboardInterrupt:  
-    # here you put any code you want to run before the program   
-    # exits when you press CTRL+C  
-        print ("\n", runonce)# print value of counter  
+    except KeyboardInterrupt:   
+        print ("bye........... \n", runonce)# print value of counter 
+        GPIO.cleanup()  
 
     finally:
         GPIO.cleanup() 
