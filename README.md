@@ -13,3 +13,6 @@ https://learn.adafruit.com/getting-started-with-raspberry-pi-pico-circuitpython/
 Conntect USB-C of pico to USB on TV
 Using Circuit Python on Rasbarry Pico code.py =
 GP16 on pico connected to GPIO21 on pi
+
+NOTE: V2 is a work around to HDMI issues of TV not turning off Anthem
+The original version does not include this
